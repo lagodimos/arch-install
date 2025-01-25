@@ -14,7 +14,7 @@ packages=(
     networkmanager
 )
 
-packages=(${packages[@]} ${kernels[@]})
+packages+=("${kernels[@]}")
 
 boot_partition=$1
 root_partition=$2
