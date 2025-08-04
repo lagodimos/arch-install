@@ -8,6 +8,7 @@ kernels=(
 )
 
 packages=(
+    dracut
     base
     linux-firmware
     sof-firmware
