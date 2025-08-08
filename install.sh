@@ -86,7 +86,7 @@ while ! arch-chroot "$root" bash -c "passwd '$username'"; do
     echo ""
 done
 
-for kernel in $kernels
+for kernel in "${kernels[@]}"
 do
     efibootmgr --create \
     --disk "$boot_disk" --part $boot_partition_num \
