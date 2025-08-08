@@ -3,8 +3,8 @@
 kernel_params="rw loglevel=3 quiet"
 
 kernels=(
-    linux-lts
     linux
+    linux-lts
 )
 
 packages=(
@@ -86,7 +86,8 @@ while ! arch-chroot "$root" bash -c "passwd '$username'"; do
     echo ""
 done
 
-for kernel in "${kernels[@]}"
+kernels_reversed=( $(printf '%s\n' "${kernels[@]}" | tac) )
+for kernel in "${kernels_reversed[@]}"
 do
     efibootmgr --create \
     --disk "$boot_disk" --part $boot_partition_num \
