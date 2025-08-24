@@ -79,8 +79,8 @@ echo "archlinux" > "$root/etc/hostname"
 echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4" >> "$root/etc/hosts"
 echo "::1         localhost localhost.localdomain localhost6 localhost6.localdomain6" >> "$root/etc/hosts"
 
-echo "Type your new username: "
-read username
+read -p "Type your new username: " username > /dev/null
+
 arch-chroot "$root" bash -c "useradd -G wheel -s /bin/bash -m '$username'"
 while ! arch-chroot "$root" bash -c "passwd '$username'"; do
     echo ""
