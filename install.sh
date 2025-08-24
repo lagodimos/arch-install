@@ -47,11 +47,11 @@ root="/archinstall"
 boot_partition_num=$(partition_num $boot_partition)
 boot_disk=$(disk_of_partition $boot_partition)
 
-mkfs -F -t ext4 "$root_partition"
+mkfs.ext4 "$root_partition"
 mkfs.fat -F 32 "$boot_partition"
 
 if [[ -z "$(partition_fs_type $home_partition)" ]]; then
-    mkfs -F -t ext4 "$home_partition"
+    mkfs.ext4 "$home_partition"
 fi
 
 parted "$boot_disk" "set $boot_partition_num boot on"
