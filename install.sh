@@ -1,43 +1,43 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 kernel_params="rw loglevel=3 quiet"
 
-kernels=(
+kernels="
     linux
     linux-lts
-)
+"
 
-packages=(
+packages="
     dracut
     base
     linux-firmware
     sof-firmware
     networkmanager
-)
+"
 
-packages+=("${kernels[@]}")
+packages+=$kernels
 
 boot_partition=$1
 root_partition=$2
 home_partition=$3
 
-disk_of_partition () {
+disk_of_partition() {
     partition=$1
     disk=$(lsblk -n -o PKNAME "$partition")
     echo "/dev/$disk"
 }
 
-partition_num () {
+partition_num() {
     partition=$1
     echo $(lsblk -n -o MIN "$partition")
 }
 
-partition_fs_type () {
+partition_fs_type() {
     partition=$1
     echo $(lsblk -n -o FSTYPE "$partition")
 }
 
-partition_fs_uuid () {
+partition_fs_uuid() {
     partition=$1
     echo $(lsblk -n -o UUID "$partition")
 }
@@ -50,7 +50,7 @@ boot_disk=$(disk_of_partition $boot_partition)
 mkfs.ext4 -L "root" "$root_partition"
 mkfs.fat -F 32 -n "boot" "$boot_partition"
 
-if [[ -z "$(partition_fs_type $home_partition)" ]]; then
+if [ -z "$(partition_fs_type $home_partition)" ]; then
     mkfs.ext4 -L "home" "$home_partition"
 fi
 
@@ -67,7 +67,7 @@ mkdir -p "$root/home"
 mount "$boot_partition" "$root/boot"
 mount "$home_partition" "$root/home"
 
-pacstrap $root ${packages[@]}
+pacstrap $root $packages
 
 arch-chroot "$root" bash -c "systemctl enable NetworkManager"
 
@@ -86,12 +86,11 @@ while ! arch-chroot "$root" bash -c "passwd '$username'"; do
     echo ""
 done
 
-kernels_reversed=( $(printf '%s\n' "${kernels[@]}" | tac) )
-for kernel in "${kernels_reversed[@]}"
+for kernel in $(echo $kernels | tac -s " ");
 do
     efibootmgr --create \
     --disk "$boot_disk" --part $boot_partition_num \
-    --label "Arch Linux$( [[ "$kernel" != "linux" ]] && echo " ($kernel)" )" \
+    --label "Arch Linux$( [ "$kernel" != "linux" ] && echo " ($kernel)" )" \
     --loader "/vmlinuz-$kernel" \
     --unicode "root=UUID=$root_uuid $kernel_params initrd=\initramfs-$kernel.img"
 done
